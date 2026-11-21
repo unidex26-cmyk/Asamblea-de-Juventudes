@@ -271,7 +271,7 @@ p{margin:0 0 1rem}
 .credencial{position:relative;background:#fff;border:1px solid var(--linea);border-radius:var(--radio);padding:2rem 1.4rem 1.4rem;text-align:center;overflow:hidden}
 .credencial::before{content:"";position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,var(--azul),var(--cielo),var(--ambar))}
 .credencial::after{content:"";position:absolute;top:16px;left:50%;transform:translateX(-50%);width:44px;height:7px;border-radius:999px;background:var(--gris-frio);border:1px solid var(--linea)}
-.credencial__avatar{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;margin:0 auto .9rem;font-weight:900;font-size:1.5rem;color:#fff;background:var(--azul);box-shadow:0 0 0 4px #fff,0 0 0 6px var(--ambar)}
+.credencial__avatar{width:76px;height:76px;border-radius:50%;display:block;margin:0 auto .9rem;object-fit:cover;background:var(--azul);box-shadow:0 0 0 4px #fff,0 0 0 6px var(--ambar)}
 .credencial:nth-child(2) .credencial__avatar{background:var(--info)}
 .credencial:nth-child(3) .credencial__avatar{background:var(--ambar-hondo)}
 .credencial h3{margin-bottom:.2rem}
