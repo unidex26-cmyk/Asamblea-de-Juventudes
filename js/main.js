@@ -347,7 +347,7 @@
       ctx.fillStyle = '#FBB03B';
       ctx.font = '700 18px Arial, sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('PASE PERSONALIZADO', 585, 350);
+      ctx.fillText('PARTICIPANTE', 585, 350);
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '900 48px Arial, sans-serif';
       const lineasNombre = [];
