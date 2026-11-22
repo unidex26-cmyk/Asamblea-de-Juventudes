@@ -204,8 +204,14 @@
       navigator.share({ title: d.title, text: textoCompartir(), url: urlActual() }).catch(function () { /* cancelado */ });
     } else copiar();
   };
-  const porWhatsApp = function () { w.open('https://wa.me/?text=' + encodeURIComponent(textoCompartir() + ' ' + urlActual()), '_blank', 'noopener'); };
-  [].slice.call(d.querySelectorAll('[data-compartir-wa]')).forEach(function (b) { b.addEventListener('click', porWhatsApp); });
+  const porWhatsApp = function () {
+    const destino = CONFIG.whatsappGrupo || ('https://wa.me/?text=' + encodeURIComponent(textoCompartir() + ' ' + urlActual()));
+    w.open(destino, '_blank', 'noopener');
+  };
+  [].slice.call(d.querySelectorAll('[data-compartir-wa]')).forEach(function (b) {
+    if (CONFIG.whatsappGrupo) { b.setAttribute('aria-label', 'Únete al grupo de WhatsApp'); b.title = 'Grupo de WhatsApp'; }
+    b.addEventListener('click', porWhatsApp);
+  });
   [].slice.call(d.querySelectorAll('[data-compartir-nativo]')).forEach(function (b) { b.addEventListener('click', nativo); });
   [].slice.call(d.querySelectorAll('[data-copiar]')).forEach(function (b) { b.addEventListener('click', copiar); });
 
@@ -238,5 +244,209 @@
     formEnlace.href = urlForm;
     formEnlace.hidden = false;
     formPendiente.hidden = true;
+  }
+
+  /* ---------- pase personalizado (se procesa localmente en el navegador) ---------- */
+  const pase = d.querySelector('[data-pase]');
+  if (pase) {
+    const tabs = [].slice.call(pase.querySelectorAll('[data-pase-tab]'));
+    const panels = [].slice.call(pase.querySelectorAll('[data-pase-panel]'));
+    const siguiente = pase.querySelector('[data-pase-siguiente]');
+    const nombre = pase.querySelector('[data-pase-nombre]');
+    const nombreVista = pase.querySelector('[data-pase-nombre-vista]');
+    const campoFoto = pase.querySelector('[data-pase-foto]');
+    const fotoVista = pase.querySelector('[data-pase-imagen]');
+    const inicial = pase.querySelector('[data-pase-inicial]');
+    const tarjeta = pase.querySelector('[data-pase-tarjeta]');
+    const descargar = pase.querySelector('[data-pase-descargar]');
+    const mensaje = pase.querySelector('[data-pase-mensaje]');
+    let foto = null, fotoUrl = '';
+
+    const informa = function (texto, error) {
+      if (!mensaje) return;
+      mensaje.textContent = texto;
+      mensaje.classList.toggle('es-error', Boolean(error));
+    };
+    const cambiaPestana = function (seleccionada) {
+      tabs.forEach(function (tab) {
+        const activa = tab.dataset.paseTab === seleccionada;
+        tab.setAttribute('aria-selected', String(activa));
+        tab.tabIndex = activa ? 0 : -1;
+      });
+      panels.forEach(function (panel) {
+        panel.hidden = panel.dataset.pasePanel !== seleccionada;
+      });
+    };
+    const actualizaNombre = function () {
+      const valor = nombre.value.trim();
+      if (nombreVista) nombreVista.textContent = valor || 'Tu nombre';
+      const iniciales = valor.split(/\s+/).slice(0, 2).map(function (parte) { return parte.charAt(0); }).join('').toLocaleUpperCase('es-PE');
+      if (inicial) inicial.textContent = iniciales || '?';
+      if (descargar) descargar.disabled = !valor;
+      if (tarjeta) tarjeta.setAttribute('aria-label', valor ? 'Vista previa del pase para ' + valor : 'Vista previa del pase personalizado');
+    };
+    tabs.forEach(function (tab, indice) {
+      tab.addEventListener('click', function () { cambiaPestana(tab.dataset.paseTab); });
+      tab.addEventListener('keydown', function (e) {
+        let destino = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') destino = (indice + 1) % tabs.length;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') destino = (indice + tabs.length - 1) % tabs.length;
+        if (e.key === 'Home') destino = 0;
+        if (e.key === 'End') destino = tabs.length - 1;
+        if (destino >= 0) {
+          e.preventDefault();
+          tabs[destino].focus();
+          cambiaPestana(tabs[destino].dataset.paseTab);
+        }
+      });
+    });
+    if (siguiente) siguiente.addEventListener('click', function () {
+      actualizaNombre();
+      cambiaPestana('vista');
+      tabs[1].focus();
+    });
+    if (nombre) nombre.addEventListener('input', actualizaNombre);
+    if (campoFoto) campoFoto.addEventListener('change', function () {
+      const archivo = campoFoto.files && campoFoto.files[0];
+      if (!archivo) return;
+      const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+      if (tiposPermitidos.indexOf(archivo.type) === -1 || archivo.size > 5 * 1024 * 1024) {
+        campoFoto.value = '';
+        informa('Selecciona una imagen JPG, PNG o WebP de máximo 5 MB.', true);
+        return;
+      }
+      const nuevoUrl = URL.createObjectURL(archivo);
+      const nuevaFoto = new Image();
+      nuevaFoto.onload = function () {
+        if (fotoUrl) URL.revokeObjectURL(fotoUrl);
+        fotoUrl = nuevoUrl;
+        foto = nuevaFoto;
+        if (fotoVista) { fotoVista.src = fotoUrl; fotoVista.hidden = false; }
+        if (inicial) inicial.hidden = true;
+        informa('Foto lista. Se conserva solo en este dispositivo.');
+      };
+      nuevaFoto.onerror = function () {
+        URL.revokeObjectURL(nuevoUrl);
+        campoFoto.value = '';
+        informa('No se pudo leer la imagen. Prueba con otro archivo.', true);
+      };
+      nuevaFoto.src = nuevoUrl;
+    });
+    if (descargar) descargar.addEventListener('click', function () {
+      const valor = nombre ? nombre.value.trim() : '';
+      if (!valor) {
+        informa('Escribe tu nombre antes de descargar el pase.', true);
+        if (nombre) nombre.focus();
+        return;
+      }
+      const lienzo = d.createElement('canvas');
+      lienzo.width = 1200;
+      lienzo.height = 740;
+      const ctx = lienzo.getContext('2d');
+      if (!ctx) {
+        informa('No se pudo generar la imagen en este navegador.', true);
+        return;
+      }
+
+      const fondo = ctx.createLinearGradient(0, 0, 1200, 740);
+      fondo.addColorStop(0, '#072A44');
+      fondo.addColorStop(1, '#04507F');
+      ctx.fillStyle = fondo;
+      ctx.fillRect(0, 0, 1200, 740);
+      ctx.fillStyle = '#FBB03B';
+      ctx.fillRect(0, 0, 18, 740);
+      ctx.fillStyle = '#FFE2B0';
+      ctx.font = '700 30px Arial, sans-serif';
+      ctx.fillText('II ASAMBLEA DE JUVENTUDES', 72, 92);
+      ctx.font = '700 22px Arial, sans-serif';
+      ctx.fillText('AREQUIPA · 2026', 850, 92);
+      ctx.strokeStyle = 'rgba(255,255,255,.28)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(72, 125);
+      ctx.lineTo(1128, 125);
+      ctx.stroke();
+      ctx.fillStyle = '#FBB03B';
+      ctx.font = '700 20px Arial, sans-serif';
+      ctx.fillText('TU PARTICIPACIÓN TRANSFORMA', 72, 220);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 48px Arial, sans-serif';
+      const palabras = valor.split(/\s+/);
+      const lineas = [];
+      let linea = '';
+      palabras.forEach(function (palabra) {
+        const prueba = linea ? linea + ' ' + palabra : palabra;
+        if (ctx.measureText(prueba).width > 650 && linea) {
+          lineas.push(linea);
+          linea = palabra;
+        } else linea = prueba;
+      });
+      if (linea) lineas.push(linea);
+      lineas.slice(0, 3).forEach(function (texto, i) { ctx.fillText(texto, 72, 320 + i * 58, 650); });
+      ctx.font = '700 25px Arial, sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText('28 de noviembre de 2026 · 9:00 a. m.', 72, 510);
+      ctx.font = '400 22px Arial, sans-serif';
+      ctx.fillText('Auditorio de Ingeniería Mecánica · UNSA', 72, 552);
+
+      const cx = 925, cy = 355, radio = 145;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+      ctx.clip();
+      if (foto) {
+        const escala = Math.max((radio * 2) / foto.width, (radio * 2) / foto.height);
+        const ancho = foto.width * escala, alto = foto.height * escala;
+        ctx.drawImage(foto, cx - ancho / 2, cy - alto / 2, ancho, alto);
+      } else {
+        ctx.fillStyle = '#006BB6';
+        ctx.fillRect(cx - radio, cy - radio, radio * 2, radio * 2);
+        const iniciales = valor.split(/\s+/).slice(0, 2).map(function (parte) { return parte.charAt(0); }).join('').toLocaleUpperCase('es-PE');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '900 88px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(iniciales, cx, cy);
+        ctx.textAlign = 'start';
+        ctx.textBaseline = 'alphabetic';
+      }
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+      ctx.strokeStyle = '#FBB03B';
+      ctx.lineWidth = 10;
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.28)';
+      ctx.beginPath();
+      ctx.moveTo(72, 635);
+      ctx.lineTo(1128, 635);
+      ctx.stroke();
+      ctx.fillStyle = '#FBB03B';
+      ctx.font = '700 20px Arial, sans-serif';
+      ctx.fillText('INGRESO GRATUITO', 72, 680);
+      ctx.textAlign = 'right';
+      ctx.fillText('AREQUIPA, PERÚ', 1128, 680);
+
+      try {
+        lienzo.toBlob(function (blob) {
+          if (!blob) {
+            informa('No se pudo crear el archivo de imagen. Inténtalo nuevamente.', true);
+            return;
+          }
+          const enlace = d.createElement('a');
+          const url = URL.createObjectURL(blob);
+          enlace.href = url;
+          enlace.download = 'pase-asamblea-juventudes.png';
+          d.body.appendChild(enlace);
+          enlace.click();
+          enlace.remove();
+          w.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+          informa('Pase descargado. Recuerda que no reemplaza la inscripción oficial.');
+        }, 'image/png');
+      } catch (e) {
+        informa('No se pudo generar la imagen en este navegador.', true);
+      }
+    });
+    actualizaNombre();
   }
 })();

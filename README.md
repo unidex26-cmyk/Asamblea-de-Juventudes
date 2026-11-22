@@ -26,8 +26,9 @@ Edita `js/config.js` y pega tu enlace de Google Forms en `formularioUrl`.
 El botón «Ir al formulario oficial» se activa automáticamente en Inscripciones.
 
 ## WhatsApp / Instagram
-En `js/config.js`: `whatsappGrupo` y `instagram`. Los botones flotantes pasan de
-«compartir» a enlaces directos al grupo/perfil. Sin configurar, comparten la página.
+En `js/config.js`: `whatsappGrupo` y `instagram`. Los botones de WhatsApp abren el
+grupo configurado; los botones flotantes pueden abrir el grupo o el perfil. Sin
+configurar, WhatsApp comparte la página.
 
 ## Reemplazar imágenes por las reales
 - Logo oficial: sustituye `assets/img/logo.svg` (y `assets/icons/favicon.svg`).
