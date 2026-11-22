@@ -282,7 +282,8 @@ p{margin:0 0 1rem}
 .ponente{display:grid;grid-template-columns:minmax(210px,32%) 1fr;min-height:220px;overflow:hidden;background:#fff;border:1px solid var(--linea);border-radius:var(--radio);box-shadow:0 6px 20px rgba(7,42,68,.08)}
 .ponente--invertido{grid-template-columns:1fr minmax(210px,32%)}
 .ponente--invertido .ponente__foto{grid-column:2;grid-row:1}
-.ponente__foto{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;min-height:220px;background:linear-gradient(145deg,var(--gris-frio),#dcebf5);color:var(--azul-hondo);font-size:.76rem;font-weight:800;letter-spacing:.1em;text-align:center;text-transform:uppercase}
+.ponente__foto{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;min-height:220px;overflow:hidden;background:linear-gradient(145deg,var(--gris-frio),#dcebf5);color:var(--azul-hondo);font-size:.76rem;font-weight:800;letter-spacing:.1em;text-align:center;text-transform:uppercase}
+.ponente__foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ponente__silueta{position:relative;display:block;width:76px;height:82px;margin-bottom:.3rem}
 .ponente__silueta::before{content:"";position:absolute;top:0;left:50%;width:44px;height:44px;transform:translateX(-50%);border-radius:50%;background:#a9c5d6}
 .ponente__silueta::after{content:"";position:absolute;bottom:0;left:50%;width:76px;height:36px;transform:translateX(-50%);border-radius:40px 40px 10px 10px;background:#a9c5d6}
