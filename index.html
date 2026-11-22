@@ -390,24 +390,9 @@
               <button class="btn btn--azul btn--sin-flecha" type="button" data-pase-siguiente>Ver mi pase</button>
             </section>
             <section class="pase__panel" id="pase-panel-vista" role="tabpanel" aria-labelledby="pase-tab-vista" data-pase-panel="vista" hidden>
-              <div class="pase__tarjeta" data-pase-tarjeta role="img" aria-label="Vista previa del pase personalizado">
-                <div class="pase__tarjeta-cab"><span>II Asamblea de Juventudes</span><span>AREQUIPA · 2026</span></div>
-                <div class="pase__tarjeta-cuerpo">
-                  <div class="pase__tarjeta-datos">
-                    <span class="pase__sello">TU PARTICIPACIÓN TRANSFORMA</span>
-                    <span class="pase__nombre" data-pase-nombre-vista>Tu nombre</span>
-                    <span class="pase__evento">28 de noviembre de 2026 · 9:00 a. m.</span>
-                    <span class="pase__sede">Auditorio de Ingeniería Mecánica · UNSA</span>
-                  </div>
-                  <div class="pase__retrato">
-                    <span data-pase-inicial aria-hidden="true">?</span>
-                    <img data-pase-imagen alt="" hidden>
-                  </div>
-                </div>
-                <div class="pase__tarjeta-pie"><span>INGRESO GRATUITO</span><span>AREQUIPA, PERÚ</span></div>
-              </div>
+              <canvas class="pase__tarjeta" data-pase-tarjeta width="1080" height="1080" role="img" aria-label="Vista previa del pase personalizado">Vista previa del pase personalizado. Escribe tu nombre para crear el pase.</canvas>
               <button class="btn btn--ambar btn--sin-flecha" type="button" data-pase-descargar disabled>Descargar pase</button>
-              <p class="pase__ayuda">Este pase es un recuerdo personalizado; no reemplaza la inscripción ni la confirmación oficial.</p>
+              <p class="pase__ayuda">Imagen cuadrada 1:1, ideal para redes. Es un recuerdo personalizado; no reemplaza la inscripción ni la confirmación oficial.</p>
             </section>
           </div>
           <a class="btn btn--ambar" data-form-enlace hidden target="_blank" rel="noopener">Ir al formulario oficial<span class="sr"> (se abre en una pestaña nueva)</span></a>

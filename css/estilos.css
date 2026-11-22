@@ -330,18 +330,7 @@ p{margin:0 0 1rem}
 .pase__ayuda,.pase__mensaje{font-size:.78rem;color:#5a5651;margin:0}
 .pase__mensaje.es-error{color:var(--peligro)}
 .pase .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
-.pase__tarjeta{aspect-ratio:1.62;overflow:hidden;border-radius:14px;background:var(--azul-noche);color:#fff;box-shadow:0 8px 20px rgba(7,42,68,.22);display:flex;flex-direction:column;padding:clamp(.65rem,2.4vw,1.1rem);gap:.6rem}
-.pase__tarjeta-cab,.pase__tarjeta-pie{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-size:clamp(.48rem,1.6vw,.7rem);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.pase__tarjeta-cab{color:var(--crema)}
-.pase__tarjeta-pie{margin-top:auto;border-top:1px solid rgba(255,255,255,.25);padding-top:.45rem;color:var(--ambar)}
-.pase__tarjeta-cuerpo{display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-height:0;flex:1}
-.pase__tarjeta-datos{display:grid;gap:.35rem;min-width:0}
-.pase__sello{color:var(--ambar);font-size:clamp(.42rem,1.4vw,.62rem);font-weight:800;letter-spacing:.12em}
-.pase__nombre{font-size:clamp(.85rem,3.8vw,1.45rem);font-weight:900;line-height:1.1;overflow-wrap:anywhere}
-.pase__evento,.pase__sede{font-size:clamp(.52rem,1.7vw,.75rem);line-height:1.3}
-.pase__retrato{width:27%;max-width:112px;aspect-ratio:1;border:3px solid var(--ambar);border-radius:50%;overflow:hidden;flex:none;display:grid;place-items:center;background:var(--azul);color:#fff;font-size:1.7rem;font-weight:900}
-.pase__retrato img{width:100%;height:100%;object-fit:cover}
-.pase__retrato img[hidden]{display:none}
+.pase__tarjeta{display:block;width:100%;height:auto;aspect-ratio:1;background:var(--azul-noche)}
 .compartir{display:flex;flex-wrap:wrap;gap:.6rem}
 .btn-compartir{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;padding:.55rem 1rem;border-radius:999px;border:1.5px solid var(--linea);background:#fff;font:700 .85rem var(--f-texto);color:var(--tinta);cursor:pointer;transition:background .2s,transform .15s,border-color .2s}
 .btn-compartir:hover{background:var(--gris-frio);border-color:var(--azul);transform:translateY(-2px)}

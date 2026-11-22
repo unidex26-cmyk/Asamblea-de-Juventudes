@@ -253,10 +253,7 @@
     const panels = [].slice.call(pase.querySelectorAll('[data-pase-panel]'));
     const siguiente = pase.querySelector('[data-pase-siguiente]');
     const nombre = pase.querySelector('[data-pase-nombre]');
-    const nombreVista = pase.querySelector('[data-pase-nombre-vista]');
     const campoFoto = pase.querySelector('[data-pase-foto]');
-    const fotoVista = pase.querySelector('[data-pase-imagen]');
-    const inicial = pase.querySelector('[data-pase-inicial]');
     const tarjeta = pase.querySelector('[data-pase-tarjeta]');
     const descargar = pase.querySelector('[data-pase-descargar]');
     const mensaje = pase.querySelector('[data-pase-mensaje]');
@@ -277,13 +274,132 @@
         panel.hidden = panel.dataset.pasePanel !== seleccionada;
       });
     };
+    const renderizaPase = function (valor) {
+      if (!tarjeta) return false;
+      const ctx = tarjeta.getContext('2d');
+      if (!ctx) {
+        informa('No se pudo mostrar la vista previa en este navegador.', true);
+        return false;
+      }
+
+      const lado = 1080;
+      ctx.clearRect(0, 0, lado, lado);
+      const fondo = ctx.createLinearGradient(0, 0, lado, lado);
+      fondo.addColorStop(0, '#072A44');
+      fondo.addColorStop(1, '#04507F');
+      ctx.fillStyle = fondo;
+      ctx.fillRect(0, 0, lado, lado);
+      ctx.fillStyle = '#FBB03B';
+      ctx.fillRect(0, 0, lado, 18);
+
+      ctx.fillStyle = '#FFE2B0';
+      ctx.font = '700 32px Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('II ASAMBLEA DE JUVENTUDES', 72, 105);
+      ctx.font = '700 24px Arial, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('AREQUIPA · 2026', 1008, 105);
+      ctx.strokeStyle = 'rgba(255,255,255,.28)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(72, 135);
+      ctx.lineTo(1008, 135);
+      ctx.stroke();
+
+      ctx.fillStyle = '#FBB03B';
+      ctx.font = '700 23px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TU PARTICIPACIÓN TRANSFORMA', 540, 215);
+
+      ctx.fillStyle = 'rgba(255,255,255,.06)';
+      ctx.fillRect(545, 290, 465, 570);
+      ctx.strokeStyle = 'rgba(255,255,255,.22)';
+      ctx.strokeRect(545, 290, 465, 570);
+
+      const cx = 300, cy = 555, radio = 215;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+      ctx.clip();
+      if (foto) {
+        const escala = Math.max((radio * 2) / foto.width, (radio * 2) / foto.height);
+        const ancho = foto.width * escala, alto = foto.height * escala;
+        ctx.drawImage(foto, cx - ancho / 2, cy - alto / 2, ancho, alto);
+      } else {
+        ctx.fillStyle = '#006BB6';
+        ctx.fillRect(cx - radio, cy - radio, radio * 2, radio * 2);
+        const iniciales = valor ? valor.split(/\s+/).slice(0, 2).map(function (parte) { return parte.charAt(0); }).join('').toLocaleUpperCase('es-PE') : '?';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '900 130px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(iniciales, cx, cy);
+        ctx.textBaseline = 'alphabetic';
+      }
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radio, 0, Math.PI * 2);
+      ctx.strokeStyle = '#FBB03B';
+      ctx.lineWidth = 12;
+      ctx.stroke();
+
+      const nombrePase = valor || 'Tu nombre';
+      ctx.fillStyle = '#FBB03B';
+      ctx.font = '700 18px Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('PASE PERSONALIZADO', 585, 350);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 48px Arial, sans-serif';
+      const lineasNombre = [];
+      let linea = '';
+      nombrePase.split(/\s+/).forEach(function (palabra) {
+        const prueba = linea ? linea + ' ' + palabra : palabra;
+        if (ctx.measureText(prueba).width > 390 && linea) {
+          lineasNombre.push(linea);
+          linea = palabra;
+        } else linea = prueba;
+      });
+      if (linea) lineasNombre.push(linea);
+      const lineasVisibles = lineasNombre.slice(0, 4);
+      const yNombre = 425 + (4 - lineasVisibles.length) * 20;
+      lineasVisibles.forEach(function (texto, i) {
+        ctx.fillText(texto, 585, yNombre + i * 58, 390);
+      });
+
+      const yDetalle = yNombre + lineasVisibles.length * 58 + 60;
+      ctx.strokeStyle = 'rgba(255,255,255,.3)';
+      ctx.beginPath();
+      ctx.moveTo(585, yDetalle - 30);
+      ctx.lineTo(970, yDetalle - 30);
+      ctx.stroke();
+      ctx.fillStyle = '#FFE2B0';
+      ctx.font = '700 22px Arial, sans-serif';
+      ctx.fillText('28 de noviembre de 2026', 585, yDetalle + 12);
+      ctx.font = '400 20px Arial, sans-serif';
+      ctx.fillText('9:00 a. m. · UNSA, Arequipa', 585, yDetalle + 52);
+      ctx.fillStyle = '#FBB03B';
+      ctx.fillRect(585, 800, 385, 42);
+      ctx.fillStyle = '#231F20';
+      ctx.font = '700 18px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('INGRESO GRATUITO', 777, 828);
+
+      ctx.strokeStyle = 'rgba(255,255,255,.28)';
+      ctx.beginPath();
+      ctx.moveTo(72, 930);
+      ctx.lineTo(1008, 930);
+      ctx.stroke();
+      ctx.fillStyle = '#FBB03B';
+      ctx.font = '700 20px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('AREQUIPA, PERÚ', 540, 982);
+      return true;
+    };
     const actualizaNombre = function () {
       const valor = nombre.value.trim();
-      if (nombreVista) nombreVista.textContent = valor || 'Tu nombre';
-      const iniciales = valor.split(/\s+/).slice(0, 2).map(function (parte) { return parte.charAt(0); }).join('').toLocaleUpperCase('es-PE');
-      if (inicial) inicial.textContent = iniciales || '?';
       if (descargar) descargar.disabled = !valor;
       if (tarjeta) tarjeta.setAttribute('aria-label', valor ? 'Vista previa del pase para ' + valor : 'Vista previa del pase personalizado');
+      renderizaPase(valor);
     };
     tabs.forEach(function (tab, indice) {
       tab.addEventListener('click', function () { cambiaPestana(tab.dataset.paseTab); });
@@ -321,8 +437,7 @@
         if (fotoUrl) URL.revokeObjectURL(fotoUrl);
         fotoUrl = nuevoUrl;
         foto = nuevaFoto;
-        if (fotoVista) { fotoVista.src = fotoUrl; fotoVista.hidden = false; }
-        if (inicial) inicial.hidden = true;
+        actualizaNombre();
         informa('Foto lista. Se conserva solo en este dispositivo.');
       };
       nuevaFoto.onerror = function () {
@@ -339,96 +454,9 @@
         if (nombre) nombre.focus();
         return;
       }
-      const lienzo = d.createElement('canvas');
-      lienzo.width = 1200;
-      lienzo.height = 740;
-      const ctx = lienzo.getContext('2d');
-      if (!ctx) {
-        informa('No se pudo generar la imagen en este navegador.', true);
-        return;
-      }
-
-      const fondo = ctx.createLinearGradient(0, 0, 1200, 740);
-      fondo.addColorStop(0, '#072A44');
-      fondo.addColorStop(1, '#04507F');
-      ctx.fillStyle = fondo;
-      ctx.fillRect(0, 0, 1200, 740);
-      ctx.fillStyle = '#FBB03B';
-      ctx.fillRect(0, 0, 18, 740);
-      ctx.fillStyle = '#FFE2B0';
-      ctx.font = '700 30px Arial, sans-serif';
-      ctx.fillText('II ASAMBLEA DE JUVENTUDES', 72, 92);
-      ctx.font = '700 22px Arial, sans-serif';
-      ctx.fillText('AREQUIPA · 2026', 850, 92);
-      ctx.strokeStyle = 'rgba(255,255,255,.28)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(72, 125);
-      ctx.lineTo(1128, 125);
-      ctx.stroke();
-      ctx.fillStyle = '#FBB03B';
-      ctx.font = '700 20px Arial, sans-serif';
-      ctx.fillText('TU PARTICIPACIÓN TRANSFORMA', 72, 220);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '900 48px Arial, sans-serif';
-      const palabras = valor.split(/\s+/);
-      const lineas = [];
-      let linea = '';
-      palabras.forEach(function (palabra) {
-        const prueba = linea ? linea + ' ' + palabra : palabra;
-        if (ctx.measureText(prueba).width > 650 && linea) {
-          lineas.push(linea);
-          linea = palabra;
-        } else linea = prueba;
-      });
-      if (linea) lineas.push(linea);
-      lineas.slice(0, 3).forEach(function (texto, i) { ctx.fillText(texto, 72, 320 + i * 58, 650); });
-      ctx.font = '700 25px Arial, sans-serif';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillText('28 de noviembre de 2026 · 9:00 a. m.', 72, 510);
-      ctx.font = '400 22px Arial, sans-serif';
-      ctx.fillText('Auditorio de Ingeniería Mecánica · UNSA', 72, 552);
-
-      const cx = 925, cy = 355, radio = 145;
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radio, 0, Math.PI * 2);
-      ctx.clip();
-      if (foto) {
-        const escala = Math.max((radio * 2) / foto.width, (radio * 2) / foto.height);
-        const ancho = foto.width * escala, alto = foto.height * escala;
-        ctx.drawImage(foto, cx - ancho / 2, cy - alto / 2, ancho, alto);
-      } else {
-        ctx.fillStyle = '#006BB6';
-        ctx.fillRect(cx - radio, cy - radio, radio * 2, radio * 2);
-        const iniciales = valor.split(/\s+/).slice(0, 2).map(function (parte) { return parte.charAt(0); }).join('').toLocaleUpperCase('es-PE');
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '900 88px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(iniciales, cx, cy);
-        ctx.textAlign = 'start';
-        ctx.textBaseline = 'alphabetic';
-      }
-      ctx.restore();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radio, 0, Math.PI * 2);
-      ctx.strokeStyle = '#FBB03B';
-      ctx.lineWidth = 10;
-      ctx.stroke();
-      ctx.strokeStyle = 'rgba(255,255,255,.28)';
-      ctx.beginPath();
-      ctx.moveTo(72, 635);
-      ctx.lineTo(1128, 635);
-      ctx.stroke();
-      ctx.fillStyle = '#FBB03B';
-      ctx.font = '700 20px Arial, sans-serif';
-      ctx.fillText('INGRESO GRATUITO', 72, 680);
-      ctx.textAlign = 'right';
-      ctx.fillText('AREQUIPA, PERÚ', 1128, 680);
-
+      if (!renderizaPase(valor)) return;
       try {
-        lienzo.toBlob(function (blob) {
+        tarjeta.toBlob(function (blob) {
           if (!blob) {
             informa('No se pudo crear el archivo de imagen. Inténtalo nuevamente.', true);
             return;
